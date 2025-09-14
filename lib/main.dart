@@ -14,7 +14,7 @@ void main() {
   );
 }
 
-Widget buildCard(String title, String obdData) {
+Widget _buildCard(String title, String obdData) {
   return Card(
     child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -37,68 +37,74 @@ Widget buildCard(String title, String obdData) {
   );
 }
 
+///The main object which represent the OBD data based on [MethodChannel]
 class BluetoothObd {
+  ///
   const BluetoothObd(this.name);
   static const _channel = MethodChannel("bluetooth_obd");
 
-  // 获得 OBD 数据
+  ///[Future] which returns the temperature from intake air
   static Future<String> get getAirIntakeTemperature async {
     final String data = await _channel.invokeMethod("getAirIntakeTemperature");
     return data;
   }
 
-  // 获得 OBD 数据
+  ///[Future which returns the milles on
   static Future<String> get getDistanceMILOn async {
     final String data = await _channel.invokeMethod("getDistanceMILOn");
     return data;
   }
 
-  // 获得 OBD-车速 数据
+  ///[Future] which returns the engine load
   static Future<String> get getEngineLoad async {
     final String data = await _channel.invokeMethod("getEngineLoad");
     return data;
   }
 
-  // 获得 OBD RPM 数据
+  ///[Future] which returns the Voltage of the module
   static Future<String> get getModuleVoltage async {
     final String data = await _channel.invokeMethod("getModuleVoltage");
     return data;
   }
 
-  // 获得 OBD RPM 数据
+  ///[Future] which returns the RPM
   static Future<String> get getRPM async {
     final String data = await _channel.invokeMethod("getRPM");
     return data;
   }
 
-  // 获得 OBD-车速 数据
+  ///[Future] which returns the vechile speed
   static Future<String> get getSpeed async {
     final String tripRecords = await _channel.invokeMethod("getSpeed");
     return tripRecords;
   }
 
-  // 启动 OBD 连接
+  ///[Future] which should start the OBD
   static Future<String> get startOBD async {
     final String startOBDMesg = await _channel.invokeMethod("startOBD");
     return startOBDMesg;
   }
 
-  // 获得 OBD 数据
+  ///[Future] which should return the trip
   static Future<String> get tripRecord async {
     final String tripRecords = await _channel.invokeMethod("getTripRecord");
     return tripRecords;
   }
 
+  ///The [name]
   final String name;
 }
 
+///Main skelethon of the app
 class MyApp extends StatefulWidget {
+  ///
   const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
+///The [Provider] class helper
 class ObdReader with ChangeNotifier, DiagnosticableTreeMixin {
   final _tripRecords = "";
   var _obdSpeed = "";
@@ -116,15 +122,31 @@ class ObdReader with ChangeNotifier, DiagnosticableTreeMixin {
     "5": ["DistanceMILOn", "0"],
   };
 
+  ///The [Map] which represent the data from ODB
   Map get obdData => _obdData;
+
+  ///
   String get obdDistanceMILOn => _obdDistanceMILOn;
+
+  ///
   String get obdEngineCoolantTemp => _obdEngineCoolantTemp;
+
+  ///
   String get obdEngineLoad => _obdEngineLoad;
+
+  ///
   String get obdEngineRpm => _obdEngineRpm;
+
+  ///
   String get obdModuleVoltage => _obdModuleVoltage;
+
+  ///
   String get obdSpeed => _obdSpeed;
+
+  ///
   String get tripRecords => _tripRecords;
 
+  ///
   Future<void> increment() async {
     try {
       _obdSpeed = await BluetoothObd.getSpeed;
@@ -176,6 +198,7 @@ class ObdReader with ChangeNotifier, DiagnosticableTreeMixin {
     notifyListeners();
   }
 
+  ///Future which starts the OBD
   Future<void> startOBD() async {
     String obdMesg;
     try {
@@ -218,7 +241,7 @@ class _MyAppState extends State<MyApp> {
         body: GridView.count(
           crossAxisCount: 2,
           children: List.generate(6, (index) {
-            return buildCard(
+            return _buildCard(
               context.watch<ObdReader>().obdData["$index"][0],
               context.watch<ObdReader>().obdData["$index"][1],
             );
